@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        <!-- 这里添加需要hook的应用包名 -->
+        <item>android</item>
+    </string-array>
+</resources> 

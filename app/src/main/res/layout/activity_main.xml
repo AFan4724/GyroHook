@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:fitsSystemWindows="false"
+        android:background="@color/background_color"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:clipToPadding="false">
+
+            <!-- Socket设置卡片 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Socket服务器设置"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:boxStrokeColor="@color/accent_color"
+                        app:hintTextColor="@color/accent_color"
+                        android:textColorHint="@color/hint_color"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPort"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="服务器端口 (默认: 16384)"
+                            android:inputType="number"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_color" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchSocket"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="启动Socket服务器"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp"
+                        app:thumbTint="@color/accent_color"
+                        app:trackTint="@color/accent_color" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- X轴设置卡片 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="X轴旋转角速度"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:boxStrokeColor="@color/accent_color"
+                        app:hintTextColor="@color/accent_color"
+                        android:textColorHint="@color/hint_color"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRotationX"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="输入X轴旋转角速度"
+                            android:inputType="numberDecimal|numberSigned"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_color" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Y轴设置卡片 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Y轴旋转角速度"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:boxStrokeColor="@color/accent_color"
+                        app:hintTextColor="@color/accent_color"
+                        android:textColorHint="@color/hint_color"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRotationY"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="输入Y轴旋转角速度"
+                            android:inputType="numberDecimal|numberSigned"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_color" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Z轴设置卡片 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Z轴旋转角速度"
+                        android:textColor="@color/text_color"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:boxStrokeColor="@color/accent_color"
+                        app:hintTextColor="@color/accent_color"
+                        android:textColorHint="@color/hint_color"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etRotationZ"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="输入Z轴旋转角速度"
+                            android:inputType="numberDecimal|numberSigned"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_color" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 应用按钮 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnApply"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                android:text="应用设置"
+                android:textSize="16sp"
+                app:cornerRadius="8dp"
+                app:elevation="4dp"
+                android:backgroundTint="@color/accent_color" />
+
+        </LinearLayout>
+    </ScrollView>
+</layout>

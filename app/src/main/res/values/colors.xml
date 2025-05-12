@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="accent_color">#448AFF</color>
+    
+    <!-- Material Design默认颜色 -->
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    
+    <!-- 深色主题颜色 -->
+    <color name="background_color">#121212</color>
+    <color name="card_background">#1E1E1E</color>
+    <color name="text_color">#FFFFFF</color>
+    <color name="hint_color">#80FFFFFF</color>
+</resources>
