@@ -45,7 +45,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Rename APK
-        run: mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/GyroHook-${{ steps.tag.outputs.TAG }}.apk
+        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/GyroHook-${{ steps.tag.outputs.TAG }}.apk
 
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
