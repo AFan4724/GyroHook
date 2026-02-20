@@ -36,7 +36,7 @@ GyroHook 是一个允许用户修改安卓设备陀螺仪传感器数据的项�
             *   可以模拟连续的陀螺仪运动并周期性发送数据。
         *   **`file` 模式**:
             *   直接读取并修改 SharedPreferences 文件 (默认路径: `/data/user/0/com.example.gyrohook/shared_prefs/gyro_settings.xml`)。
-            *   注意: 该工具会将数据以 JSON 格式写入文件，而原生 SharedPreferences 是 XML 格式。这依赖于 Xposed 模块或应用端对此的兼容处理。
+            *   写入标准 SharedPreferences XML 格式，可被 `XSharedPreferences` 直接读取。
     *   `GyroHook.cpp` / `GyroHook.hpp`: 包含了 C++ 客户端的 Socket 通信逻辑 (`GyroClient` 类) 和文件操作逻辑 (`GyroFileUtils` 命名空间)。
 
 ## 工作流程
@@ -115,7 +115,7 @@ GyroHook 是一个允许用户修改安卓设备陀螺仪传感器数据的项�
 
 *   **Xposed 依赖**: `GyroHook.kt` 模块的运行需要设备上已安装并激活 Xposed 框架。
 *   **文件权限**: 确保配置文件具有正确的读写权限，以便应用、Xposed 模块和 C++ 工具能够正常访问。安卓应用在保存设置时会尝试设置文件权限。
-*   **配置文件格式**: C++ 工具目前以 JSON 格式写入配置文件，而安卓的 SharedPreferences 通常是 XML 格式。`XSharedPreferences` 在读取时需要能正确解析这种由 C++ 工具写入的 JSON 格式文件，或者 C++ 工具生成的文件需要与 `XSharedPreferences` 的期望格式一致。目前代码中 C++ 端写入的是一个纯 JSON 字符串到 `.xml` 后缀的文件。
+*   **配置文件格式**: C++ 工具写入标准 SharedPreferences XML 格式，`XSharedPreferences` 可以直接读取。
 
 ## 许可
 
