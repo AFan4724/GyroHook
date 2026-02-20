@@ -6,6 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:fitsSystemWindows="true"
         android:background="@color/background_color">
 
         <!-- Toolbar -->
@@ -15,7 +16,8 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"
             app:titleTextColor="@android:color/white"
-            app:title="@string/app_name" />
+            app:title="@string/app_name"
+            app:menu="@menu/menu_main" />
 
         <ScrollView
             android:layout_width="match_parent"

@@ -13,6 +13,7 @@
         <!-- 状态栏和导航栏设置 -->
         <item name="android:statusBarColor">@color/primary_dark</item>
         <item name="android:navigationBarColor">@color/background_color</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
 
         <!-- 文字颜色 -->
         <item name="android:textColor">@color/text_color</item>
