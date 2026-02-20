@@ -81,17 +81,18 @@ namespace GyroFileUtils {
             return false;
         }
 
-        std::ostringstream jsonStream;
-        jsonStream << std::fixed << std::setprecision(6);
+        std::ostringstream xmlStream;
+        xmlStream << std::fixed << std::setprecision(6);
 
-        jsonStream << "{\n";
-        jsonStream << "  \"rotation_x\": " << x << ",\n";
-        jsonStream << "  \"rotation_y\": " << y << ",\n";
-        jsonStream << "  \"rotation_z\": " << z << ",\n";
-        jsonStream << "  \"socket_port\": " << portVal << "\n";
-        jsonStream << "}";
+        xmlStream << "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n";
+        xmlStream << "<map>\n";
+        xmlStream << "    <float name=\"x\" value=\"" << x << "\" />\n";
+        xmlStream << "    <float name=\"y\" value=\"" << y << "\" />\n";
+        xmlStream << "    <float name=\"z\" value=\"" << z << "\" />\n";
+        xmlStream << "    <int name=\"socket_port\" value=\"" << portVal << "\" />\n";
+        xmlStream << "</map>";
 
-        outFile << jsonStream.str();
+        outFile << xmlStream.str();
         
         if (outFile.fail()) {
             std::cerr << "GyroFileUtils: 写入文件失败: " << filePath << std::endl;
