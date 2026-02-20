@@ -15,4 +15,8 @@
     <string name="socket_started">Socket 服务器已启动，端口：</string>
     <string name="socket_stopped">Socket 服务器已停止</string>
     <string name="failed_load_settings">加载设置失败</string>
+    <string name="language_switch">语言</string>
+    <string name="language_en">English</string>
+    <string name="language_zh">中文</string>
+    <string name="language_dialog_title">选择语言</string>
 </resources>

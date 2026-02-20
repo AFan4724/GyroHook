@@ -1,0 +1,47 @@
+name: Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Get tag name
+        id: tag
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.TAG }}
+          name: GyroHook ${{ steps.tag.outputs.TAG }}
+          files: app/build/outputs/apk/release/app-release-unsigned.apk
+          body: |
+            ## GyroHook ${{ steps.tag.outputs.TAG }}
+
+            自动构建的 Release APK / Auto-built Release APK
+
+            ### 安装说明 / Installation
+            - 需要 Xposed / LSPosed 框架 / Requires Xposed / LSPosed framework
+            - 在模块管理器中激活本模块 / Activate this module in the module manager
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
