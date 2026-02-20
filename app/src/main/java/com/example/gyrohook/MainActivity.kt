@@ -1,11 +1,15 @@
 package com.example.gyrohook
 
+import android.content.Context
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import android.content.Context
+import androidx.appcompat.widget.Toolbar
 import android.util.Log
 import java.net.ServerSocket
 import java.net.Socket
@@ -19,6 +23,7 @@ import java.io.FileWriter
 import com.example.gyrohook.databinding.ActivityMainBinding
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -28,12 +33,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var etPort: EditText
     private lateinit var btnApply: Button
     private lateinit var switchSocket: SwitchMaterial
-    
+
     private var serverSocket: ServerSocket? = null
     private var serverJob: Job? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
     private var isServerRunning = false
     private val PREF_NAME = "gyro_settings"
+    private val PREF_APP = "app_settings"
 
     companion object {
         private const val TAG = "GyroHook"
@@ -44,10 +50,23 @@ class MainActivity : AppCompatActivity() {
         private const val DEFAULT_PORT = 16384
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        val prefs = newBase.getSharedPreferences("app_settings", MODE_PRIVATE)
+        val lang = prefs.getString("app_language", "en") ?: "en"
+        val locale = if (lang == "zh") Locale.CHINESE else Locale.ENGLISH
+        val config = newBase.resources.configuration
+        config.setLocale(locale)
+        val context = newBase.createConfigurationContext(config)
+        super.attachBaseContext(context)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val toolbar: Toolbar = binding.toolbar
+        setSupportActionBar(toolbar)
 
         try {
             val prefs = getSharedPreferences(PREF_NAME, Context.MODE_WORLD_READABLE)
@@ -59,28 +78,43 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, getString(R.string.failed_load_settings), Toast.LENGTH_SHORT).show()
         }
 
-        binding.btnApply.setOnClickListener {
-            try {
-                val prefs = getSharedPreferences(PREF_NAME, Context.MODE_WORLD_READABLE)
-                prefs.edit().apply {
-                    putFloat("x", binding.etRotationX.text.toString().toFloatOrNull() ?: 0f)
-                    putFloat("y", binding.etRotationY.text.toString().toFloatOrNull() ?: 0f)
-                    putFloat("z", binding.etRotationZ.text.toString().toFloatOrNull() ?: 0f)
-                    apply()
-                }
-                Toast.makeText(this, getString(R.string.settings_saved), Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Log.e("GyroHook", "Failed to save preferences", e)
-                Toast.makeText(this, getString(R.string.save_failed) + e.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-
         initializeViews()
         loadSettings()
         setupApplyButton()
         setupSocketSwitch()
-
         ensureFilePermissions()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_language -> {
+                showLanguageDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showLanguageDialog() {
+        val prefs = getSharedPreferences(PREF_APP, MODE_PRIVATE)
+        val current = prefs.getString("app_language", "en") ?: "en"
+        val options = arrayOf(getString(R.string.language_en), getString(R.string.language_zh))
+        val currentIndex = if (current == "zh") 1 else 0
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.language_dialog_title))
+            .setSingleChoiceItems(options, currentIndex) { dialog, which ->
+                val lang = if (which == 1) "zh" else "en"
+                prefs.edit().putString("app_language", lang).apply()
+                dialog.dismiss()
+                recreate()
+            }
+            .show()
     }
 
     private fun ensureFilePermissions() {
@@ -97,7 +131,6 @@ class MainActivity : AppCompatActivity() {
             }
             settingsFile.setReadable(true, false)
             Log.d(TAG, "Settings file path: ${settingsFile.absolutePath}")
-            Log.d(TAG, "Settings file readable: ${settingsFile.canRead()}")
         } catch (e: Exception) {
             Log.e(TAG, "Error ensuring file permissions: ${e.message}")
         }
@@ -120,12 +153,10 @@ class MainActivity : AppCompatActivity() {
     private fun loadSettings() {
         try {
             val prefs = getSharedPreferences(PREF_NAME, Context.MODE_WORLD_READABLE)
-            
             etRotationX.setText(prefs.getFloat("x", 0f).toString())
             etRotationY.setText(prefs.getFloat("y", 0f).toString())
             etRotationZ.setText(prefs.getFloat("z", 0f).toString())
             etPort.setText(prefs.getInt("socket_port", DEFAULT_PORT).toString())
-            
             Log.d(TAG, "Settings loaded successfully")
         } catch (e: Exception) {
             Log.e(TAG, "Error loading settings: ${e.message}")
@@ -146,18 +177,18 @@ class MainActivity : AppCompatActivity() {
                 putInt("socket_port", port)
                 apply()
             }
-            
+
             val dataDir = File(applicationInfo.dataDir)
             val sharedPrefsDir = File(dataDir, "shared_prefs")
             val prefsFile = File(sharedPrefsDir, "${PREF_NAME}.xml")
-            
+
             if (prefsFile.exists()) {
                 prefsFile.setReadable(true, false)
                 sharedPrefsDir.setExecutable(true, false)
                 sharedPrefsDir.setReadable(true, false)
                 Log.d(TAG, "Set permissions for: ${prefsFile.absolutePath}")
             }
-            
+
             Log.d(TAG, "Settings saved - X: $x, Y: $y, Z: $z, Port: $port")
         } catch (e: Exception) {
             Log.e(TAG, "Error saving settings: ${e.message}")
@@ -172,7 +203,6 @@ class MainActivity : AppCompatActivity() {
                 val y = etRotationY.text.toString().toFloatOrNull() ?: 0f
                 val z = etRotationZ.text.toString().toFloatOrNull() ?: 0f
                 val port = etPort.text.toString().toIntOrNull() ?: DEFAULT_PORT
-
                 saveSettings(x, y, z, port)
                 Toast.makeText(this, getString(R.string.settings_saved), Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
@@ -198,7 +228,7 @@ class MainActivity : AppCompatActivity() {
             if (port < 1024 || port > 65535) {
                 throw IllegalArgumentException("端口号必须在1024-65535之间")
             }
-            
+
             serverJob = coroutineScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, e ->
                 Log.e(TAG, "Server coroutine error: ${e.message}")
                 handleServerError(e)
@@ -207,7 +237,7 @@ class MainActivity : AppCompatActivity() {
                     serverSocket = ServerSocket(port)
                     isServerRunning = true
                     Log.d(TAG, "Socket server started on port $port")
-                    
+
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@MainActivity, getString(R.string.socket_started) + port, Toast.LENGTH_SHORT).show()
                     }
@@ -267,14 +297,13 @@ class MainActivity : AppCompatActivity() {
                                         etRotationX.setText(x.toString())
                                         etRotationY.setText(y.toString())
                                         etRotationZ.setText(z.toString())
-                                        
                                         saveSettings(x, y, z)
                                     }
                                 } else {
                                     Log.e(TAG, "Error parsing floats from string: $line")
                                 }
                             } else {
-                                Log.w(TAG, "Received malformed line (expected 3 parts separated by comma): $line")
+                                Log.w(TAG, "Received malformed line: $line")
                             }
                         } else {
                             Log.d(TAG, "Client disconnected or end of stream.")
@@ -282,7 +311,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     } catch (e: SocketException) {
                         if (isServerRunning) {
-                            Log.e(TAG, "Client read error or socket closed: ${e.message}")
+                            Log.e(TAG, "Client read error: ${e.message}")
                         }
                         break
                     } catch (e: NumberFormatException) {
@@ -307,7 +336,7 @@ class MainActivity : AppCompatActivity() {
             is IllegalArgumentException -> e.message ?: "端口号无效"
             else -> "服务器错误：${e.message}"
         }
-        
+
         coroutineScope.launch(Dispatchers.Main) {
             Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_LONG).show()
             switchSocket.isChecked = false
@@ -342,4 +371,4 @@ class MainActivity : AppCompatActivity() {
         stopSocketServer()
         coroutineScope.cancel()
     }
-} 
+}

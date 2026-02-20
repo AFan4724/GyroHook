@@ -15,4 +15,8 @@
     <string name="socket_started">Socket server started on port: </string>
     <string name="socket_stopped">Socket server stopped</string>
     <string name="failed_load_settings">Failed to load settings</string>
+    <string name="language_switch">Language</string>
+    <string name="language_en">English</string>
+    <string name="language_zh">中文</string>
+    <string name="language_dialog_title">Select Language</string>
 </resources>
