@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
             binding.etRotationZ.setText(prefs.getFloat("z", 0f).toString())
         } catch (e: Exception) {
             Log.e("GyroHook", "Failed to load preferences", e)
-            Toast.makeText(this, "Failed to load settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.failed_load_settings), Toast.LENGTH_SHORT).show()
         }
 
         binding.btnApply.setOnClickListener {
@@ -68,10 +68,10 @@ class MainActivity : AppCompatActivity() {
                     putFloat("z", binding.etRotationZ.text.toString().toFloatOrNull() ?: 0f)
                     apply()
                 }
-                Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.settings_saved), Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Log.e("GyroHook", "Failed to save preferences", e)
-                Toast.makeText(this, "Failed to save settings", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.save_failed) + e.message, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Settings saved - X: $x, Y: $y, Z: $z, Port: $port")
         } catch (e: Exception) {
             Log.e(TAG, "Error saving settings: ${e.message}")
-            Toast.makeText(this, "保存失败：${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.save_failed) + e.message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -174,10 +174,10 @@ class MainActivity : AppCompatActivity() {
                 val port = etPort.text.toString().toIntOrNull() ?: DEFAULT_PORT
 
                 saveSettings(x, y, z, port)
-                Toast.makeText(this, "设置已保存！", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.settings_saved), Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Log.e(TAG, "Error saving settings: ${e.message}")
-                Toast.makeText(this, "保存失败：${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.save_failed) + e.message, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -209,7 +209,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, "Socket server started on port $port")
                     
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@MainActivity, "Socket服务器已启动，端口：$port", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, getString(R.string.socket_started) + port, Toast.LENGTH_SHORT).show()
                     }
 
                     while (isActive && isServerRunning) {
@@ -331,7 +331,7 @@ class MainActivity : AppCompatActivity() {
             serverJob?.cancel()
             closeServerSocket()
             Log.d(TAG, "Socket server stopped")
-            Toast.makeText(this, "Socket服务器已停止", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.socket_stopped), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping socket server: ${e.message}")
         }

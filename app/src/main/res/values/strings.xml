@@ -1,3 +1,18 @@
 <resources>
-    <string name="app_name">gyrohook</string>
+    <string name="app_name">GyroHook</string>
+    <string name="socket_server_settings">Socket Server Settings</string>
+    <string name="server_port_hint">Server Port (default: 16384)</string>
+    <string name="start_socket_server">Start Socket Server</string>
+    <string name="x_axis_title">X-Axis Angular Velocity</string>
+    <string name="x_axis_hint">Enter X-axis angular velocity</string>
+    <string name="y_axis_title">Y-Axis Angular Velocity</string>
+    <string name="y_axis_hint">Enter Y-axis angular velocity</string>
+    <string name="z_axis_title">Z-Axis Angular Velocity</string>
+    <string name="z_axis_hint">Enter Z-axis angular velocity</string>
+    <string name="apply_settings">Apply Settings</string>
+    <string name="settings_saved">Settings saved!</string>
+    <string name="save_failed">Save failed: </string>
+    <string name="socket_started">Socket server started on port: </string>
+    <string name="socket_stopped">Socket server stopped</string>
+    <string name="failed_load_settings">Failed to load settings</string>
 </resources>

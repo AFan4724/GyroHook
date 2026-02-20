@@ -36,7 +36,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Socket服务器设置"
+                        android:text="@string/socket_server_settings"
                         android:textColor="@color/text_color"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -54,7 +54,7 @@
                             android:id="@+id/etPort"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="服务器端口 (默认: 16384)"
+                            android:hint="@string/server_port_hint"
                             android:inputType="number"
                             android:textSize="16sp"
                             android:textColor="@color/text_color" />
@@ -65,7 +65,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:text="启动Socket服务器"
+                        android:text="@string/start_socket_server"
                         android:textColor="@color/text_color"
                         android:textSize="16sp"
                         app:thumbTint="@color/accent_color"
@@ -91,7 +91,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="X轴旋转角速度"
+                        android:text="@string/x_axis_title"
                         android:textColor="@color/text_color"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -109,7 +109,7 @@
                             android:id="@+id/etRotationX"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="输入X轴旋转角速度"
+                            android:hint="@string/x_axis_hint"
                             android:inputType="numberDecimal|numberSigned"
                             android:textSize="16sp"
                             android:textColor="@color/text_color" />
@@ -135,7 +135,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Y轴旋转角速度"
+                        android:text="@string/y_axis_title"
                         android:textColor="@color/text_color"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -153,7 +153,7 @@
                             android:id="@+id/etRotationY"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="输入Y轴旋转角速度"
+                            android:hint="@string/y_axis_hint"
                             android:inputType="numberDecimal|numberSigned"
                             android:textSize="16sp"
                             android:textColor="@color/text_color" />
@@ -179,7 +179,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Z轴旋转角速度"
+                        android:text="@string/z_axis_title"
                         android:textColor="@color/text_color"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -197,7 +197,7 @@
                             android:id="@+id/etRotationZ"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="输入Z轴旋转角速度"
+                            android:hint="@string/z_axis_hint"
                             android:inputType="numberDecimal|numberSigned"
                             android:textSize="16sp"
                             android:textColor="@color/text_color" />
@@ -212,7 +212,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:padding="16dp"
-                android:text="应用设置"
+                android:text="@string/apply_settings"
                 android:textSize="16sp"
                 app:cornerRadius="8dp"
                 app:elevation="4dp"
