@@ -29,6 +29,21 @@ jobs:
         id: tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # 获取上一个 tag
+          PREV_TAG=$(git tag --sort=-creatordate | sed -n '2p')
+          if [ -z "$PREV_TAG" ]; then
+            LOG=$(git log --pretty=format:"- %s" HEAD)
+          else
+            LOG=$(git log --pretty=format:"- %s" ${PREV_TAG}..HEAD)
+          fi
+          # 写入多行输出
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          echo "$LOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -38,7 +53,8 @@ jobs:
           body: |
             ## GyroHook ${{ steps.tag.outputs.TAG }}
 
-            自动构建的 Release APK / Auto-built Release APK
+            ### 更新内容 / Changelog
+            ${{ steps.changelog.outputs.CHANGELOG }}
 
             ### 安装说明 / Installation
             - 需要 Xposed / LSPosed 框架 / Requires Xposed / LSPosed framework
