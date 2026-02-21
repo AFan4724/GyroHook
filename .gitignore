@@ -15,3 +15,7 @@
 local.properties
 /.vscode
 /.cursor
+/keystore.properties
+/keystore/
+*.jks
+*.keystore
