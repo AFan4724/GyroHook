@@ -5,248 +5,193 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:background="@color/background_color"
         android:fitsSystemWindows="true"
-        android:background="@color/background_color">
+        android:orientation="vertical">
 
-        <!-- Toolbar -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
+            style="@style/Widget.GyroHook.Toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
-            app:titleTextColor="@android:color/white"
-            app:title="@string/app_name"
-            app:menu="@menu/menu_main" />
+            app:menu="@menu/menu_main"
+            app:title="@string/app_name" />
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:fillViewport="true"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipToPadding="false"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:clipToPadding="false">
+                android:padding="@dimen/spacing_md">
 
-                <!-- Socket设置卡片 -->
                 <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.GyroHook.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/card_background">
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:layout_marginBottom="@dimen/spacing_md">
 
                     <LinearLayout
+                        style="@style/GyroHookCardContent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/GyroHookSectionHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/socket_server_settings"
-                            android:textColor="@color/text_color"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
                             android:drawableStart="@drawable/ic_wifi"
-                            android:drawablePadding="8dp"
-                            android:gravity="center_vertical" />
+                            android:text="@string/socket_server_settings" />
 
                         <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.GyroHook.TextInputLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            app:boxStrokeColor="@color/accent_color"
-                            app:hintTextColor="@color/accent_color"
-                            android:textColorHint="@color/hint_color"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                            android:layout_marginTop="@dimen/spacing_sm">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etPort"
+                                style="@style/Widget.GyroHook.TextInputEditText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/server_port_hint"
-                                android:inputType="number"
-                                android:textSize="16sp"
-                                android:textColor="@color/text_color" />
+                                android:inputType="number" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/switchSocket"
+                            style="@style/Widget.GyroHook.Switch"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:text="@string/start_socket_server"
-                            android:textColor="@color/text_color"
-                            android:textSize="16sp"
-                            app:thumbTint="@color/accent_color"
-                            app:trackTint="@color/accent_color" />
+                            android:layout_marginTop="@dimen/spacing_md"
+                            android:text="@string/start_socket_server" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- X轴设置卡片 -->
                 <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.GyroHook.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/card_background">
+                    android:layout_marginBottom="@dimen/spacing_md">
 
                     <LinearLayout
+                        style="@style/GyroHookCardContent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/GyroHookSectionHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/x_axis_title"
-                            android:textColor="@color/text_color"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
                             android:drawableStart="@drawable/ic_rotate_right"
-                            android:drawablePadding="8dp"
-                            android:gravity="center_vertical" />
+                            android:text="@string/x_axis_title" />
 
                         <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.GyroHook.TextInputLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            app:boxStrokeColor="@color/accent_color"
-                            app:hintTextColor="@color/accent_color"
-                            android:textColorHint="@color/hint_color"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                            android:layout_marginTop="@dimen/spacing_sm">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etRotationX"
+                                style="@style/Widget.GyroHook.TextInputEditText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/x_axis_hint"
-                                android:inputType="numberDecimal|numberSigned"
-                                android:textSize="16sp"
-                                android:textColor="@color/text_color" />
+                                android:inputType="numberDecimal|numberSigned" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Y轴设置卡片 -->
                 <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.GyroHook.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/card_background">
+                    android:layout_marginBottom="@dimen/spacing_md">
 
                     <LinearLayout
+                        style="@style/GyroHookCardContent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/GyroHookSectionHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/y_axis_title"
-                            android:textColor="@color/text_color"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
                             android:drawableStart="@drawable/ic_rotate_left"
-                            android:drawablePadding="8dp"
-                            android:gravity="center_vertical" />
+                            android:text="@string/y_axis_title" />
 
                         <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.GyroHook.TextInputLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            app:boxStrokeColor="@color/accent_color"
-                            app:hintTextColor="@color/accent_color"
-                            android:textColorHint="@color/hint_color"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                            android:layout_marginTop="@dimen/spacing_sm">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etRotationY"
+                                style="@style/Widget.GyroHook.TextInputEditText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/y_axis_hint"
-                                android:inputType="numberDecimal|numberSigned"
-                                android:textSize="16sp"
-                                android:textColor="@color/text_color" />
+                                android:inputType="numberDecimal|numberSigned" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Z轴设置卡片 -->
                 <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.GyroHook.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/card_background">
+                    android:layout_marginBottom="@dimen/spacing_md">
 
                     <LinearLayout
+                        style="@style/GyroHookCardContent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="vertical">
 
                         <TextView
+                            style="@style/GyroHookSectionHeader"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/z_axis_title"
-                            android:textColor="@color/text_color"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
                             android:drawableStart="@drawable/ic_360"
-                            android:drawablePadding="8dp"
-                            android:gravity="center_vertical" />
+                            android:text="@string/z_axis_title" />
 
                         <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.GyroHook.TextInputLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            app:boxStrokeColor="@color/accent_color"
-                            app:hintTextColor="@color/accent_color"
-                            android:textColorHint="@color/hint_color"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                            android:layout_marginTop="@dimen/spacing_sm">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/etRotationZ"
+                                style="@style/Widget.GyroHook.TextInputEditText"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/z_axis_hint"
-                                android:inputType="numberDecimal|numberSigned"
-                                android:textSize="16sp"
-                                android:textColor="@color/text_color" />
+                                android:inputType="numberDecimal|numberSigned" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 应用按钮 -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnApply"
+                    style="@style/Widget.GyroHook.PrimaryButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:padding="16dp"
+                    android:layout_marginTop="@dimen/spacing_sm"
                     android:text="@string/apply_settings"
-                    android:textSize="16sp"
-                    app:cornerRadius="8dp"
-                    app:elevation="4dp"
-                    app:icon="@drawable/ic_rotate_right"
-                    android:backgroundTint="@color/accent_color" />
-
+                    app:icon="@drawable/ic_rotate_right" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

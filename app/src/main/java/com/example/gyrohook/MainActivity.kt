@@ -10,6 +10,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import android.util.Log
 import java.net.ServerSocket
 import java.net.Socket
@@ -62,6 +65,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, true)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.primary)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.background_color)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = false
+            isAppearanceLightNavigationBars = true
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -69,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         try {
-            val prefs = getSharedPreferences(PREF_NAME, Context.MODE_WORLD_READABLE)
+            val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             binding.etRotationX.setText(prefs.getFloat("x", 0f).toString())
             binding.etRotationY.setText(prefs.getFloat("y", 0f).toString())
             binding.etRotationZ.setText(prefs.getFloat("z", 0f).toString())
@@ -152,7 +163,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadSettings() {
         try {
-            val prefs = getSharedPreferences(PREF_NAME, Context.MODE_WORLD_READABLE)
+            val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             etRotationX.setText(prefs.getFloat("x", 0f).toString())
             etRotationY.setText(prefs.getFloat("y", 0f).toString())
             etRotationZ.setText(prefs.getFloat("z", 0f).toString())
@@ -169,7 +180,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveSettings(x: Float, y: Float, z: Float, port: Int = DEFAULT_PORT) {
         try {
-            val prefs = getSharedPreferences(PREF_NAME, Context.MODE_WORLD_READABLE)
+            val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             prefs.edit().apply {
                 putFloat("x", x)
                 putFloat("y", y)
