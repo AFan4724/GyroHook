@@ -19,6 +19,28 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Prepare signing files
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          set -e
+          test -n "$SIGNING_KEYSTORE_BASE64"
+          test -n "$SIGNING_STORE_PASSWORD"
+          test -n "$SIGNING_KEY_ALIAS"
+          test -n "$SIGNING_KEY_PASSWORD"
+
+          mkdir -p keystore
+          printf "%s" "$SIGNING_KEYSTORE_BASE64" | base64 --decode > keystore/release.jks
+          cat > keystore.properties <<EOF
+          storeFile=keystore/release.jks
+          storePassword=$SIGNING_STORE_PASSWORD
+          keyAlias=$SIGNING_KEY_ALIAS
+          keyPassword=$SIGNING_KEY_PASSWORD
+          EOF
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
