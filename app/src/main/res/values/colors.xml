@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#2196F3</color>
-    <color name="primary_dark">#1976D2</color>
-    <color name="accent_color">#448AFF</color>
+    <color name="primary">#1E6FD9</color>
+    <color name="primary_dark">#1657AD</color>
+    <color name="accent_color">#2D8CFF</color>
     
     <!-- Material Design默认颜色 -->
     <color name="purple_200">#BB86FC</color>
@@ -14,8 +14,8 @@
     <color name="white">#FFFFFF</color>
     
     <!-- 深色主题颜色 -->
-    <color name="background_color">#121212</color>
-    <color name="card_background">#1E1E1E</color>
-    <color name="text_color">#FFFFFF</color>
-    <color name="hint_color">#80FFFFFF</color>
+    <color name="background_color">#F3F8FF</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="text_color">#16324F</color>
+    <color name="hint_color">#7A8CA5</color>
 </resources>

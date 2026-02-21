@@ -59,6 +59,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
+        }
         release {
             isMinifyEnabled = false
             signingConfig = if (keystorePropertiesFile.exists()) {
@@ -91,5 +98,4 @@ dependencies {
     
     // Xposed API
     compileOnly("de.robv.android.xposed:api:82")
-    compileOnly("de.robv.android.xposed:api:82:sources")
 }

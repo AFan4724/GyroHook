@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.GyroHook.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="android:background">@color/primary</item>
+        <item name="titleTextColor">@color/white</item>
+    </style>
+
+    <style name="Widget.GyroHook.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">@dimen/radius_card</item>
+        <item name="cardElevation">@dimen/elevation_card</item>
+    </style>
+
+    <style name="GyroHookCardContent">
+        <item name="android:padding">@dimen/spacing_md</item>
+    </style>
+
+    <style name="TextAppearance.GyroHook.SectionTitle" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_size_title</item>
+    </style>
+
+    <style name="GyroHookSectionHeader">
+        <item name="android:drawablePadding">@dimen/spacing_sm</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textAppearance">@style/TextAppearance.GyroHook.SectionTitle</item>
+    </style>
+
+    <style name="Widget.GyroHook.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/accent_color</item>
+        <item name="hintTextColor">@color/accent_color</item>
+        <item name="android:textColorHint">@color/hint_color</item>
+    </style>
+
+    <style name="Widget.GyroHook.TextInputEditText" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textSize">@dimen/text_size_body</item>
+    </style>
+
+    <style name="Widget.GyroHook.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="thumbTint">@color/accent_color</item>
+        <item name="trackTint">@color/accent_color</item>
+    </style>
+
+    <style name="Widget.GyroHook.PrimaryButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/accent_color</item>
+        <item name="android:padding">@dimen/spacing_md</item>
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+        <item name="elevation">@dimen/elevation_card</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+</resources>
