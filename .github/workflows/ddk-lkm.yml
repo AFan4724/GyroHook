@@ -14,22 +14,22 @@ on:
 jobs:
   build-lkm:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/ylarod/ddk-min:${{ inputs.kmi }}-${{ inputs.ddk_release }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      options: --privileged
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Build module in DDK container
+      - name: Build module
         run: |
           set -e
-          IMAGE="ghcr.io/ylarod/ddk-min:${{ inputs.kmi }}-${{ inputs.ddk_release }}"
-          docker run --rm --privileged \
-            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
-            -w "$GITHUB_WORKSPACE/kernel" \
-            "$IMAGE" \
-            sh -c "make CC=clang"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          cd kernel
+          make CC=clang
 
       - name: Prepare artifact
         run: |
