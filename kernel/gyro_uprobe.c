@@ -106,7 +106,7 @@ static int gyro_register_uprobe(const struct gyro_hook_setup *setup)
     }
 
     if (setup->sensor_api != GYRO_SENSOR_AIDL &&
-        setup->sensor_api != GYRO_SENSOR_LEGACY) {
+        setup->sensor_api != GYRO_SENSOR_HIDL) {
         return -EINVAL;
     }
 

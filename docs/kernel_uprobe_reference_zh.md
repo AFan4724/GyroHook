@@ -21,8 +21,8 @@ sensorType 等于 4：把保存的 X/Y 加到陀螺仪前两个轴
 两种事件布局：
 
 ```text
-AIDL：     X = Event + 0x18，Y = Event + 0x1c
-旧版接口： X = Event + 0x10，Y = Event + 0x14
+AIDL：X = Event + 0x18，Y = Event + 0x1c
+HIDL：X = Event + 0x10，Y = Event + 0x14
 ```
 
 回调只修改正在转换的原始 `Event`，原 `convertToSensorEvent` 随后继续执行。
@@ -34,7 +34,7 @@ AIDL：     X = Event + 0x18，Y = Event + 0x1c
 ```c
 struct gyro_hook_setup {
     int convert_offset; // convertToSensorEvent 相对库基址的偏移
-    int sensor_api;     // 1 = AIDL，2 = 旧版传感器接口
+    int sensor_api;     // 1 = AIDL，2 = HIDL
 };
 ```
 

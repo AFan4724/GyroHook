@@ -13,7 +13,7 @@
 
 #define GYRO_HOOK_IOC_MAGIC 'G'
 #define GYRO_SENSOR_AIDL 1
-#define GYRO_SENSOR_LEGACY 2
+#define GYRO_SENSOR_HIDL 2
 
 struct gyro_hook_setup {
     int convert_offset;
@@ -67,7 +67,7 @@ static void *resolve_convert_function(int *sensor_api,
     *sensor_api = GYRO_SENSOR_AIDL;
     if (!address) {
         address = dlsym(handle, kHidlConvertSymbol);
-        *sensor_api = GYRO_SENSOR_LEGACY;
+        *sensor_api = GYRO_SENSOR_HIDL;
     }
 
     if (!address) {

@@ -7,7 +7,7 @@
 #define GYRO_HOOK_IOC_MAGIC 'G'
 
 #define GYRO_SENSOR_AIDL 1
-#define GYRO_SENSOR_LEGACY 2
+#define GYRO_SENSOR_HIDL 2
 
 struct gyro_hook_setup {
     int convert_offset;
