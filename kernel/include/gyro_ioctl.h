@@ -3,34 +3,27 @@
 #define GYRO_UPROBE_IOCTL_H
 
 #include <linux/ioctl.h>
-#include <linux/types.h>
 
 #define GYRO_HOOK_IOC_MAGIC 'G'
 
-#define GYRO_HOOK_INIT_TYPE 100U
-#define GYRO_HOOK_VECTOR_TYPE 0U
+#define GYRO_SENSOR_AIDL 1
+#define GYRO_SENSOR_LEGACY 2
 
-#define GYRO_API_AIDL 1U
-#define GYRO_API_HIDL_V10 2U
-
-struct gyro_hook_init {
-    __u32 type;
-    __u32 convert_offset;
-    __u32 api_version;
-    __u32 reserved;
+struct gyro_hook_setup {
+    int convert_offset;
+    int sensor_api;
 };
 
-struct gyro_vector {
-    __u32 type;
+struct gyro_motion_vector {
     float x;
     float y;
-    __u32 active;
+    int enabled;
 };
 
-#define GYRO_IOC_SET_HOOK \
-    _IOW(GYRO_HOOK_IOC_MAGIC, 1, struct gyro_hook_init)
-#define GYRO_IOC_SET_VEC \
-    _IOW(GYRO_HOOK_IOC_MAGIC, 2, struct gyro_vector)
+#define GYRO_IOC_SETUP \
+    _IOW(GYRO_HOOK_IOC_MAGIC, 1, struct gyro_hook_setup)
+#define GYRO_IOC_SET_MOTION \
+    _IOW(GYRO_HOOK_IOC_MAGIC, 2, struct gyro_motion_vector)
 #define GYRO_IOC_DISABLE _IO(GYRO_HOOK_IOC_MAGIC, 3)
 
 #endif

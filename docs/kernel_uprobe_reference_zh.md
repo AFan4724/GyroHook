@@ -21,33 +21,30 @@ sensorType 等于 4：把保存的 X/Y 加到陀螺仪前两个轴
 两种事件布局：
 
 ```text
-AIDL：       X = Event + 0x18，Y = Event + 0x1c
-HIDL V1_0：  X = Event + 0x10，Y = Event + 0x14
+AIDL：     X = Event + 0x18，Y = Event + 0x1c
+旧版接口： X = Event + 0x10，Y = Event + 0x14
 ```
 
 回调只修改正在转换的原始 `Event`，原 `convertToSensorEvent` 随后继续执行。
 
 ## ioctl 协议
 
-初始化包：
+初始化参数：
 
 ```c
-struct gyro_hook_init {
-    __u32 type;           // 100
-    __u32 convert_offset; // convertToSensorEvent 相对库基址的偏移
-    __u32 api_version;    // 1 = AIDL，2 = HIDL V1_0
-    __u32 reserved;
+struct gyro_hook_setup {
+    int convert_offset; // convertToSensorEvent 相对库基址的偏移
+    int sensor_api;     // 1 = AIDL，2 = 旧版传感器接口
 };
 ```
 
-向量包：
+向量参数：
 
 ```c
-struct gyro_vector {
-    __u32 type;   // 0
+struct gyro_motion_vector {
     float x;
     float y;
-    __u32 active; // 1 = 启用，0 = 停止叠加
+    int enabled; // 1 = 启用，0 = 停止叠加
 };
 ```
 

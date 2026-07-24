@@ -23,11 +23,11 @@
 
 struct gyro_state {
     spinlock_t lock;
-    u32 api_version;
-    u32 convert_offset;
+    int sensor_api;
+    int convert_offset;
     float x;
     float y;
-    bool active;
+    bool enabled;
     bool registered;
     struct uprobe_consumer consumer;
 };
@@ -44,8 +44,8 @@ static int gyro_uprobe_pre_handler(struct uprobe_consumer *consumer,
     float vector[2];
     float x;
     float y;
-    u32 api_version;
-    bool active;
+    int sensor_api;
+    bool enabled;
 
     if (!regs) {
         return 0;
@@ -55,11 +55,11 @@ static int gyro_uprobe_pre_handler(struct uprobe_consumer *consumer,
     spin_lock(&current->lock);
     x = current->x;
     y = current->y;
-    active = current->active;
-    api_version = current->api_version;
+    enabled = current->enabled;
+    sensor_api = current->sensor_api;
     spin_unlock(&current->lock);
 
-    if (!active || (x == 0.0f && y == 0.0f)) {
+    if (!enabled || (x == 0.0f && y == 0.0f)) {
         return 0;
     }
 
@@ -74,7 +74,7 @@ static int gyro_uprobe_pre_handler(struct uprobe_consumer *consumer,
         return 0;
     }
 
-    vector_offset = api_version == GYRO_API_AIDL
+    vector_offset = sensor_api == GYRO_SENSOR_AIDL
                         ? AIDL_GYRO_VECTOR_OFFSET
                         : HIDL_GYRO_VECTOR_OFFSET;
 
@@ -95,18 +95,18 @@ static int gyro_uprobe_pre_handler(struct uprobe_consumer *consumer,
     return 0;
 }
 
-static int gyro_register_uprobe(const struct gyro_hook_init *init)
+static int gyro_register_uprobe(const struct gyro_hook_setup *setup)
 {
     struct path path;
     struct inode *inode;
     int result;
 
-    if (init->convert_offset == 0) {
+    if (setup->convert_offset <= 0) {
         return -EINVAL;
     }
 
-    if (init->api_version != GYRO_API_AIDL &&
-        init->api_version != GYRO_API_HIDL_V10) {
+    if (setup->sensor_api != GYRO_SENSOR_AIDL &&
+        setup->sensor_api != GYRO_SENSOR_LEGACY) {
         return -EINVAL;
     }
 
@@ -126,13 +126,13 @@ static int gyro_register_uprobe(const struct gyro_hook_init *init)
     }
 
     spin_lock(&state.lock);
-    state.api_version = init->api_version;
-    state.convert_offset = init->convert_offset;
+    state.sensor_api = setup->sensor_api;
+    state.convert_offset = setup->convert_offset;
     spin_unlock(&state.lock);
 
     memset(&state.consumer, 0, sizeof(state.consumer));
     state.consumer.handler = gyro_uprobe_pre_handler;
-    result = uprobe_register(inode, init->convert_offset, &state.consumer);
+    result = uprobe_register(inode, setup->convert_offset, &state.consumer);
     path_put(&path);
     if (result) {
         return result;
@@ -165,39 +165,33 @@ static void gyro_unregister_uprobe(void)
     spin_lock(&state.lock);
     state.x = 0.0f;
     state.y = 0.0f;
-    state.active = false;
+    state.enabled = false;
     spin_unlock(&state.lock);
 }
 
 static long gyro_ioctl(struct file *file, unsigned int command,
                        unsigned long argument)
 {
-    struct gyro_hook_init init;
-    struct gyro_vector vector;
+    struct gyro_hook_setup setup;
+    struct gyro_motion_vector motion;
 
     switch (command) {
-    case GYRO_IOC_SET_HOOK:
-        if (copy_from_user(&init, (const void __user *)argument,
-                           sizeof(init))) {
+    case GYRO_IOC_SETUP:
+        if (copy_from_user(&setup, (const void __user *)argument,
+                           sizeof(setup))) {
             return -EFAULT;
         }
-        if (init.type != GYRO_HOOK_INIT_TYPE) {
-            return -EINVAL;
-        }
-        return gyro_register_uprobe(&init);
+        return gyro_register_uprobe(&setup);
 
-    case GYRO_IOC_SET_VEC:
-        if (copy_from_user(&vector, (const void __user *)argument,
-                           sizeof(vector))) {
+    case GYRO_IOC_SET_MOTION:
+        if (copy_from_user(&motion, (const void __user *)argument,
+                           sizeof(motion))) {
             return -EFAULT;
-        }
-        if (vector.type != GYRO_HOOK_VECTOR_TYPE) {
-            return -EINVAL;
         }
         spin_lock(&state.lock);
-        state.x = vector.x;
-        state.y = vector.y;
-        state.active = vector.active != 0;
+        state.x = motion.x;
+        state.y = motion.y;
+        state.enabled = motion.enabled != 0;
         spin_unlock(&state.lock);
         return 0;
 
@@ -205,7 +199,7 @@ static long gyro_ioctl(struct file *file, unsigned int command,
         spin_lock(&state.lock);
         state.x = 0.0f;
         state.y = 0.0f;
-        state.active = false;
+        state.enabled = false;
         spin_unlock(&state.lock);
         return 0;
 

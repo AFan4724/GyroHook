@@ -3,7 +3,6 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -13,27 +12,23 @@
 #include <unistd.h>
 
 #define GYRO_HOOK_IOC_MAGIC 'G'
-#define GYRO_HOOK_INIT_TYPE 100U
-#define GYRO_HOOK_VECTOR_TYPE 0U
-#define GYRO_API_AIDL 1U
-#define GYRO_API_HIDL_V10 2U
+#define GYRO_SENSOR_AIDL 1
+#define GYRO_SENSOR_LEGACY 2
 
-struct gyro_hook_init {
-    uint32_t type;
-    uint32_t convert_offset;
-    uint32_t api_version;
-    uint32_t reserved;
+struct gyro_hook_setup {
+    int convert_offset;
+    int sensor_api;
 };
 
-struct gyro_vector {
-    uint32_t type;
+struct gyro_motion_vector {
     float x;
     float y;
-    uint32_t active;
+    int enabled;
 };
 
-#define GYRO_IOC_SET_HOOK _IOW(GYRO_HOOK_IOC_MAGIC, 1, struct gyro_hook_init)
-#define GYRO_IOC_SET_VEC _IOW(GYRO_HOOK_IOC_MAGIC, 2, struct gyro_vector)
+#define GYRO_IOC_SETUP _IOW(GYRO_HOOK_IOC_MAGIC, 1, struct gyro_hook_setup)
+#define GYRO_IOC_SET_MOTION \
+    _IOW(GYRO_HOOK_IOC_MAGIC, 2, struct gyro_motion_vector)
 #define GYRO_IOC_DISABLE _IO(GYRO_HOOK_IOC_MAGIC, 3)
 
 static const char *const kSensorServicePath =
@@ -55,7 +50,7 @@ static void print_usage(const char *program)
             program, program, program, program);
 }
 
-static void *resolve_convert_function(uint32_t *api_version,
+static void *resolve_convert_function(int *sensor_api,
                                       uintptr_t *base_address)
 {
     Dl_info info;
@@ -69,10 +64,10 @@ static void *resolve_convert_function(uint32_t *api_version,
     }
 
     address = dlsym(handle, kAidlConvertSymbol);
-    *api_version = GYRO_API_AIDL;
+    *sensor_api = GYRO_SENSOR_AIDL;
     if (!address) {
         address = dlsym(handle, kHidlConvertSymbol);
-        *api_version = GYRO_API_HIDL_V10;
+        *sensor_api = GYRO_SENSOR_LEGACY;
     }
 
     if (!address) {
@@ -106,61 +101,58 @@ static int command_init(const char *device_path)
 {
     uintptr_t base_address = 0;
     uintptr_t address;
-    uint32_t api_version = 0;
+    int sensor_api = 0;
     void *convert;
     int fd;
-    struct gyro_hook_init init = {
-        .type = GYRO_HOOK_INIT_TYPE,
-        .reserved = 0,
-    };
+    struct gyro_hook_setup setup = {0};
 
-    convert = resolve_convert_function(&api_version, &base_address);
+    convert = resolve_convert_function(&sensor_api, &base_address);
     if (!convert) {
         return 1;
     }
 
     address = (uintptr_t)convert;
-    if (address < base_address || address - base_address > UINT32_MAX) {
+    if (address < base_address || address - base_address > INT32_MAX) {
         fprintf(stderr, "invalid convert offset\n");
         return 1;
     }
 
-    init.convert_offset = (uint32_t)(address - base_address);
-    init.api_version = api_version;
+    setup.convert_offset = (int)(address - base_address);
+    setup.sensor_api = sensor_api;
 
     fd = open_device(device_path);
     if (fd < 0) {
         return 1;
     }
 
-    if (ioctl(fd, GYRO_IOC_SET_HOOK, &init) < 0) {
-        fprintf(stderr, "GYRO_IOC_SET_HOOK: %s\n", strerror(errno));
+    if (ioctl(fd, GYRO_IOC_SETUP, &setup) < 0) {
+        fprintf(stderr, "GYRO_IOC_SETUP: %s\n", strerror(errno));
         close(fd);
         return 1;
     }
 
-    printf("hook installed: api=%u offset=0x%08" PRIx32 "\n", api_version,
-           init.convert_offset);
+    printf("hook installed: sensor_api=%d offset=0x%08x\n", sensor_api,
+           setup.convert_offset);
     close(fd);
     return 0;
 }
 
-static int command_set(const char *device_path, float x, float y, bool active)
+static int command_set(const char *device_path, float x, float y,
+                       bool enabled)
 {
     int fd = open_device(device_path);
-    struct gyro_vector vector = {
-        .type = GYRO_HOOK_VECTOR_TYPE,
+    struct gyro_motion_vector motion = {
         .x = x,
         .y = y,
-        .active = active ? 1U : 0U,
+        .enabled = enabled ? 1 : 0,
     };
 
     if (fd < 0) {
         return 1;
     }
 
-    if (ioctl(fd, GYRO_IOC_SET_VEC, &vector) < 0) {
-        fprintf(stderr, "GYRO_IOC_SET_VEC: %s\n", strerror(errno));
+    if (ioctl(fd, GYRO_IOC_SET_MOTION, &motion) < 0) {
+        fprintf(stderr, "GYRO_IOC_SET_MOTION: %s\n", strerror(errno));
         close(fd);
         return 1;
     }

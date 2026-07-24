@@ -21,33 +21,30 @@ sensorType == 4: add the saved X/Y vector to the first two gyroscope axes
 Supported layouts:
 
 ```text
-AIDL:       X = Event + 0x18, Y = Event + 0x1c
-HIDL V1_0:  X = Event + 0x10, Y = Event + 0x14
+AIDL:           X = Event + 0x18, Y = Event + 0x1c
+Legacy interface: X = Event + 0x10, Y = Event + 0x14
 ```
 
 The handler modifies the original event before the normal conversion function continues.
 
 ## ioctl protocol
 
-Initialization packet:
+Initialization arguments:
 
 ```c
-struct gyro_hook_init {
-    __u32 type;           // 100
-    __u32 convert_offset; // convertToSensorEvent offset from library base
-    __u32 api_version;    // 1 = AIDL, 2 = HIDL V1_0
-    __u32 reserved;
+struct gyro_hook_setup {
+    int convert_offset; // convertToSensorEvent offset from library base
+    int sensor_api;     // 1 = AIDL, 2 = legacy sensor interface
 };
 ```
 
-Vector packet:
+Vector arguments:
 
 ```c
-struct gyro_vector {
-    __u32 type;   // 0
+struct gyro_motion_vector {
     float x;
     float y;
-    __u32 active; // 1 = enabled, 0 = disabled
+    int enabled; // 1 = enabled, 0 = disabled
 };
 ```
 
