@@ -36,7 +36,7 @@ GyroHook 提供两种修改安卓陀螺仪数据的实现路径：一套基于 X
 4. **内核 uprobe 参考实现 (`kernel` 与 `userspace` 目录)**:
    - 独立内核模块：通过 uprobe 挂钩 `libsensorservice.so` 的传感器事件转换函数。
    - 用户态工具：自动选择 AIDL/HIDL 转换函数并通过 ioctl 写入二维陀螺仪向量。
-   - 使用与构建说明见 [内核 uprobe 参考实现](docs/内核_uprobe_参考实现.md)。
+   - 使用与构建说明见 [内核 uprobe 参考实现](docs/kernel_uprobe_reference_zh.md)。
    - `kernel/gyro_uprobe.c` 使用 GPL-2.0；用户态工具与 Xposed 部分仍使用 MIT。
 
 ## 工作流程
