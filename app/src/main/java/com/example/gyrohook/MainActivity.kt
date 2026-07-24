@@ -178,14 +178,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveSettings(x: Float, y: Float, z: Float, port: Int = DEFAULT_PORT) {
+    private fun saveSettings(x: Float, y: Float, z: Float, port: Int? = null) {
         try {
             val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             prefs.edit().apply {
                 putFloat("x", x)
                 putFloat("y", y)
                 putFloat("z", z)
-                putInt("socket_port", port)
+                if (port != null) {
+                    putInt("socket_port", port)
+                }
                 apply()
             }
 

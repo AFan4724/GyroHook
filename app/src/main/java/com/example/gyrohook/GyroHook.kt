@@ -1,8 +1,6 @@
 package com.example.gyrohook
 
 import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.util.Log
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.IXposedHookZygoteInit
 import de.robv.android.xposed.XC_MethodHook
@@ -10,88 +8,58 @@ import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import de.robv.android.xposed.XSharedPreferences
-import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 class GyroHook : IXposedHookLoadPackage, IXposedHookZygoteInit {
     companion object {
         private const val TAG = "GyroHook"
         private const val PACKAGE_NAME = "com.example.gyrohook"
         private const val PREF_NAME = "gyro_settings"
-        
-        private fun loadPreferences(): Triple<Float, Float, Float> {
-            try {
-                val prefs = XSharedPreferences(PACKAGE_NAME, PREF_NAME)
-                if (!prefs.file.canRead()) {
-                    XposedBridge.log("$TAG: Cannot read preferences file")
-                    return Triple(0f, 0f, 0f)
-                }
-                
-                val x = prefs.getFloat("x", 0f)
-                val y = prefs.getFloat("y", 0f)
-                val z = prefs.getFloat("z", 0f)
-                
-                XposedBridge.log("$TAG: Successfully loaded values - X: $x, Y: $y, Z: $z")
-                return Triple(x, y, z)
-            } catch (e: Exception) {
-                XposedBridge.log("$TAG: Error loading preferences: ${e.message}")
-                return Triple(0f, 0f, 0f)
-            }
-        }
+        private const val RELOAD_INTERVAL_MS = 500L
     }
 
-    private lateinit var modulePath: String
     private var prefs: XSharedPreferences? = null
 
+    @Volatile
     private var addRotationX = 0f
+
+    @Volatile
     private var addRotationY = 0f
+
+    @Volatile
     private var addRotationZ = 0f
 
+    @Volatile
+    private var lastReloadTime = 0L
+
+    private val gyroHandleCache = ConcurrentHashMap<Int, Boolean>()
+
     override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
-        modulePath = startupParam.modulePath
-        prefs = XSharedPreferences("com.example.gyrohook", PREF_NAME)
+        prefs = XSharedPreferences(PACKAGE_NAME, PREF_NAME)
         prefs?.makeWorldReadable()
-        XposedBridge.log("$TAG: Initialized in Zygote with module path: $modulePath")
     }
 
-    private fun loadPreferences() {
+    private fun reloadPreferencesIfNeeded() {
+        val now = System.currentTimeMillis()
+        if (now - lastReloadTime < RELOAD_INTERVAL_MS) return
+        lastReloadTime = now
+
         try {
-            XposedBridge.log("$TAG: Starting to load preferences")
-            
-            prefs?.reload()
-            
-            val prefsFile = File("/data/user/0/com.example.gyrohook/shared_prefs/${PREF_NAME}.xml")
-            XposedBridge.log("$TAG: Preferences file exists: ${prefsFile.exists()}")
-            XposedBridge.log("$TAG: Preferences file readable: ${prefsFile.canRead()}")
-            if (prefsFile.exists()) {
-                XposedBridge.log("$TAG: Preferences file path: ${prefsFile.absolutePath}")
-            }
-            
-            val (x, y, z) = Companion.loadPreferences()
-            
-            addRotationX = x
-            addRotationY = y
-            addRotationZ = z
-            
-            XposedBridge.log("$TAG: Loaded values - X: $addRotationX, Y: $addRotationY, Z: $addRotationZ")
-            
-            if (addRotationX == 0f && addRotationY == 0f && addRotationZ == 0f) {
-                XposedBridge.log("$TAG: Warning - All values are 0, might indicate loading failure")
-                prefs = XSharedPreferences("com.example.gyrohook", PREF_NAME)
-                prefs?.makeWorldReadable()
-            }
+            val p = prefs ?: XSharedPreferences(PACKAGE_NAME, PREF_NAME).also { prefs = it }
+            p.reload()
+            addRotationX = p.getFloat("x", 0f)
+            addRotationY = p.getFloat("y", 0f)
+            addRotationZ = p.getFloat("z", 0f)
         } catch (e: Exception) {
             XposedBridge.log("$TAG: Error loading preferences: ${e.message}")
-            e.printStackTrace()
         }
     }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
-        XposedBridge.log("$TAG: Module initialized for package: ${lpparam.packageName}")
-        
+        if (lpparam.packageName == PACKAGE_NAME) return
+
         try {
-            loadPreferences()
-            
-            XposedBridge.log("$TAG: Starting gyroscope hook with additional values - X: $addRotationX, Y: $addRotationY, Z: $addRotationZ")
+            reloadPreferencesIfNeeded()
 
             XposedHelpers.findAndHookMethod(
                 "android.hardware.SystemSensorManager\$SensorEventQueue",
@@ -105,46 +73,41 @@ class GyroHook : IXposedHookLoadPackage, IXposedHookZygoteInit {
                     override fun beforeHookedMethod(param: MethodHookParam) {
                         try {
                             val handle = param.args[0] as Int
-                            val values = param.args[1] as FloatArray
+                            if (!isGyroscopeSensor(handle, param.thisObject)) return
 
-                            if (isGyroscopeSensor(handle, param.thisObject)) {
-                                loadPreferences()
-                                
-                                values[0] += addRotationX
-                                values[1] += addRotationY
-                                values[2] += addRotationZ
-                                
-                                XposedBridge.log("$TAG: Modified gyroscope values - Original+Added: X: ${values[0]}, Y: ${values[1]}, Z: ${values[2]}")
-                            }
+                            reloadPreferencesIfNeeded()
+                            if (addRotationX == 0f && addRotationY == 0f && addRotationZ == 0f) return
+
+                            val values = param.args[1] as FloatArray
+                            values[0] += addRotationX
+                            values[1] += addRotationY
+                            values[2] += addRotationZ
                         } catch (e: Exception) {
                             XposedBridge.log("$TAG: Error in beforeHookedMethod: ${e.message}")
-                            e.printStackTrace()
                         }
                     }
                 }
             )
-            XposedBridge.log("$TAG: Successfully hooked sensor method")
         } catch (e: Exception) {
             XposedBridge.log("$TAG: Error in handleLoadPackage: ${e.message}")
-            e.printStackTrace()
         }
     }
 
     private fun isGyroscopeSensor(handle: Int, eventQueue: Any): Boolean {
+        gyroHandleCache[handle]?.let { return it }
+
+        val isGyro = detectGyroscopeSensor(handle, eventQueue)
+        gyroHandleCache[handle] = isGyro
+        return isGyro
+    }
+
+    private fun detectGyroscopeSensor(handle: Int, eventQueue: Any): Boolean {
         try {
-            val sensorManager = XposedHelpers.getObjectField(eventQueue, "mManager")
-            if (sensorManager != null) {
-                val sensors = XposedHelpers.callMethod(sensorManager, "getSensorList", Sensor.TYPE_ALL) as List<*>
-                for (sensor in sensors) {
-                    val sensorHandle = XposedHelpers.getIntField(sensor, "mHandle")
-                    if (sensorHandle == handle) {
-                        val type = XposedHelpers.getIntField(sensor, "mType")
-                        val isGyro = type == Sensor.TYPE_GYROSCOPE
-                        if (isGyro) {
-                            XposedBridge.log("$TAG: Found gyroscope sensor with handle: $handle")
-                        }
-                        return isGyro
-                    }
+            val sensorManager = XposedHelpers.getObjectField(eventQueue, "mManager") ?: return false
+            val sensors = XposedHelpers.callMethod(sensorManager, "getSensorList", Sensor.TYPE_ALL) as List<*>
+            for (sensor in sensors) {
+                if (XposedHelpers.getIntField(sensor, "mHandle") == handle) {
+                    return XposedHelpers.getIntField(sensor, "mType") == Sensor.TYPE_GYROSCOPE
                 }
             }
         } catch (e: Exception) {
