@@ -1,4 +1,4 @@
-name: Release APK
+name: Release
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
 
     steps:
@@ -47,6 +47,78 @@ jobs:
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 7
+
+  build-gyroctl:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build gyroctl
+        run: |
+          set -e
+          NDK_PATH=$(find "$ANDROID_HOME/ndk" -maxdepth 1 -mindepth 1 -type d | sort -V | tail -n 1)
+          test -n "$NDK_PATH"
+          "$NDK_PATH/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang" \
+            -O2 -Wall -Wextra -Werror \
+            -o gyroctl-aarch64-linux-android \
+            userspace/gyroctl.c \
+            -ldl
+
+      - name: Upload gyroctl
+        uses: actions/upload-artifact@v4
+        with:
+          name: gyroctl
+          path: gyroctl-aarch64-linux-android
+          if-no-files-found: error
+          retention-days: 7
+
+  build-lkm:
+    uses: ./.github/workflows/build-lkm.yml
+    with:
+      ddk_release: '20260313'
+
+  publish:
+    needs:
+      - build-apk
+      - build-gyroctl
+      - build-lkm
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: apk
+          path: release/
+
+      - name: Download gyroctl
+        uses: actions/download-artifact@v4
+        with:
+          name: gyroctl
+          path: release/
+
+      - name: Download kernel modules
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*-lkm'
+          path: release/
+          merge-multiple: true
+
       - name: Get tag name
         id: tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
@@ -54,35 +126,41 @@ jobs:
       - name: Generate changelog
         id: changelog
         run: |
-          # 获取上一个 tag
           PREV_TAG=$(git tag --sort=-creatordate | sed -n '2p')
           if [ -z "$PREV_TAG" ]; then
             LOG=$(git log --pretty=format:"- %s" HEAD)
           else
             LOG=$(git log --pretty=format:"- %s" ${PREV_TAG}..HEAD)
           fi
-          # 写入多行输出
           echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
           echo "$LOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Rename APK
-        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/GyroHook-${{ steps.tag.outputs.TAG }}.apk
+      - name: Rename release files
+        run: |
+          set -e
+          mv release/app-release.apk "release/GyroHook-${{ steps.tag.outputs.TAG }}.apk"
+          mv release/gyroctl-aarch64-linux-android "release/GyroCtl-${{ steps.tag.outputs.TAG }}-aarch64-linux-android"
 
-      - name: Upload APK to GitHub Release
+      - name: Upload files to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.TAG }}
           name: GyroHook ${{ steps.tag.outputs.TAG }}
-          files: app/build/outputs/apk/release/GyroHook-${{ steps.tag.outputs.TAG }}.apk
+          files: release/*
           body: |
             ## GyroHook ${{ steps.tag.outputs.TAG }}
 
             ### 更新内容 / Changelog
             ${{ steps.changelog.outputs.CHANGELOG }}
 
+            ### 附件说明 / Files
+            - `GyroHook-${{ steps.tag.outputs.TAG }}.apk`: Xposed 应用层 Hook
+            - `GyroCtl-${{ steps.tag.outputs.TAG }}-aarch64-linux-android`: Android 用户态控制工具
+            - `*_gyrohook.ko`: 对应 GKI/KMI 内核模块
+
             ### 安装说明 / Installation
-            - 需要 Xposed / LSPosed 框架 / Requires Xposed / LSPosed framework
-            - 在模块管理器中激活本模块 / Activate this module in the module manager
+            - Xposed 版需要 Xposed / LSPosed 框架 / Requires Xposed / LSPosed framework
+            - 内核版需要与设备 GKI/KMI 匹配的内核模块 / Match the kernel module to the device GKI/KMI
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,44 @@
+name: Build Kernel Modules
+
+on:
+  workflow_call:
+    inputs:
+      kmi:
+        required: true
+        type: string
+      ddk_release:
+        required: false
+        type: string
+        default: '20260313'
+
+jobs:
+  build-lkm:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/ylarod/ddk-min:${{ inputs.kmi }}-${{ inputs.ddk_release }}
+      options: --privileged
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build module
+        run: |
+          set -e
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          cd kernel
+          CC=clang make
+
+      - name: Prepare artifact
+        run: |
+          set -e
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          cp kernel/gyrohook.ko "$GITHUB_WORKSPACE/out/${{ inputs.kmi }}_gyrohook.ko"
+          llvm-strip -d "$GITHUB_WORKSPACE/out/${{ inputs.kmi }}_gyrohook.ko"
+
+      - name: Upload module
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.kmi }}-lkm
+          path: out/${{ inputs.kmi }}_gyrohook.ko
+          if-no-files-found: error
+          retention-days: 7

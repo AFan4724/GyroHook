@@ -1,0 +1,33 @@
+name: Build Kernel Modules
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'kernel/**'
+      - '.github/workflows/build-lkm.yml'
+      - '.github/workflows/ddk-lkm.yml'
+  workflow_call:
+    inputs:
+      ddk_release:
+        required: false
+        type: string
+        default: '20260313'
+
+jobs:
+  build-lkm:
+    strategy:
+      fail-fast: false
+      matrix:
+        kmi:
+          - android12-5.10
+          - android13-5.10
+          - android13-5.15
+          - android14-5.15
+          - android14-6.1
+          - android15-6.6
+          - android16-6.12
+    uses: ./.github/workflows/ddk-lkm.yml
+    with:
+      kmi: ${{ matrix.kmi }}
+      ddk_release: ${{ inputs.ddk_release }}
