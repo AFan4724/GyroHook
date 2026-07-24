@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
-#ifndef GYRO_UPROBE_IOCTL_H
-#define GYRO_UPROBE_IOCTL_H
+#ifndef GYROHOOK_IOCTL_H
+#define GYROHOOK_IOCTL_H
 
 #include <linux/ioctl.h>
 

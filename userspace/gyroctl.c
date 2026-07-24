@@ -33,7 +33,7 @@ struct gyro_motion_vector {
 
 static const char *const kSensorServicePath =
     "/system/lib64/libsensorservice.so";
-static const char *const kDevicePath = "/dev/gyro_uprobe";
+static const char *const kDevicePath = "/dev/gyrohook";
 static const char *const kAidlConvertSymbol =
     "_ZN7android8hardware7sensors14implementation20convertToSensorEventERKN4aidl7android8hardware7sensors5EventEP15sensors_event_t";
 static const char *const kHidlConvertSymbol =

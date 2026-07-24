@@ -13,7 +13,7 @@
 #include <linux/uaccess.h>
 #include <linux/uprobes.h>
 
-#include "include/gyro_ioctl.h"
+#include "include/gyrohook.h"
 
 #define SENSOR_TYPE_GYROSCOPE 4
 #define SENSOR_TYPE_OFFSET 0x0c
@@ -216,7 +216,7 @@ static const struct file_operations gyro_fops = {
 
 static struct miscdevice gyro_device = {
     .minor = MISC_DYNAMIC_MINOR,
-    .name = "gyro_uprobe",
+    .name = "gyrohook",
     .fops = &gyro_fops,
     .mode = 0600,
 };
@@ -238,4 +238,4 @@ module_exit(gyro_module_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("AFan4724");
-MODULE_DESCRIPTION("Kernel uprobe gyroscope vector hook");
+MODULE_DESCRIPTION("Kernel gyroscope hook module");

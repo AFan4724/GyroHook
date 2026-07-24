@@ -1,4 +1,4 @@
-obj-m += gyro_uprobe.o
+obj-m += gyrohook.o
 
 KDIR ?= /lib/modules/$(shell uname -r)/build
 

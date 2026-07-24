@@ -1,4 +1,4 @@
-# GyroHook 内核 uprobe 参考实现
+# GyroHook 内核参考实现
 
 `kernel/` 和 `userspace/` 是一套独立的内核陀螺仪 Hook 参考实现，不依赖现有 Xposed 模块。
 
@@ -51,7 +51,7 @@ struct gyro_motion_vector {
 设备节点：
 
 ```text
-/dev/gyro_uprobe
+/dev/gyrohook
 ```
 
 ## 内核要求
@@ -63,12 +63,12 @@ CONFIG_UPROBES=y
 CONFIG_UPROBE_EVENTS=y
 ```
 
-模块使用 `uprobe_register`。该符号通常是 GPL-only 导出，因此 `kernel/gyro_uprobe.c`
+模块使用 `uprobe_register`。该符号通常是 GPL-only 导出，因此 `kernel/gyrohook.c`
 必须使用 `MODULE_LICENSE("GPL")`，源码也按 GPL-2.0 声明。不同 Android/GKI 内核可能限制该符号的正常模块导出，构建前必须确认目标内核允许当前模块解析该符号。
 
 ## 许可证边界
 
-- `kernel/gyro_uprobe.c`：GPL-2.0。
+- `kernel/gyrohook.c`：GPL-2.0。
 - `kernel/include/gyro_ioctl.h`：GPL-2.0 WITH Linux-syscall-note。
 - `userspace/gyroctl.c`：普通用户态程序，继续使用项目现有 MIT 协议。
 - `app/` 与 `test/` 的 Xposed 方案：继续使用项目现有 MIT 协议。
@@ -92,7 +92,7 @@ make -C userspace CC=<android-ndk-toolchain>/bin/clang
 加载模块：
 
 ```bash
-insmod kernel/gyro_uprobe.ko
+insmod kernel/gyrohook.ko
 ```
 
 安装 Hook：
@@ -116,7 +116,7 @@ insmod kernel/gyro_uprobe.ko
 卸载模块：
 
 ```bash
-rmmod gyro_uprobe
+rmmod gyrohook
 ```
 
 ## 限制

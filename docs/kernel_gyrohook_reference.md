@@ -1,4 +1,4 @@
-# Kernel uprobe reference implementation
+# Kernel GyroHook reference implementation
 
 `kernel/` and `userspace/` provide a standalone kernel-side gyroscope hook reference implementation. It does not depend on the existing Xposed module.
 
@@ -51,7 +51,7 @@ struct gyro_motion_vector {
 Device node:
 
 ```text
-/dev/gyro_uprobe
+/dev/gyrohook
 ```
 
 ## Kernel requirements
@@ -63,11 +63,11 @@ CONFIG_UPROBES=y
 CONFIG_UPROBE_EVENTS=y
 ```
 
-The module calls `uprobe_register`. That symbol is commonly exported as GPL-only, so `kernel/gyro_uprobe.c` must use `MODULE_LICENSE("GPL")` and is declared as GPL-2.0. Android/GKI kernels may also restrict normal module access to this symbol, so symbol resolution must be verified for the exact target kernel.
+The module calls `uprobe_register`. That symbol is commonly exported as GPL-only, so `kernel/gyrohook.c` must use `MODULE_LICENSE("GPL")` and is declared as GPL-2.0. Android/GKI kernels may also restrict normal module access to this symbol, so symbol resolution must be verified for the exact target kernel.
 
 ## License boundaries
 
-- `kernel/gyro_uprobe.c`: GPL-2.0.
+- `kernel/gyrohook.c`: GPL-2.0.
 - `kernel/include/gyro_ioctl.h`: GPL-2.0 WITH Linux-syscall-note.
 - `userspace/gyroctl.c`: ordinary userspace program, remains under the project's MIT license.
 - `app/` and `test/`: the existing Xposed implementation remains under the project's MIT license.
@@ -91,7 +91,7 @@ make -C userspace CC=<android-ndk-toolchain>/bin/clang
 Load the module:
 
 ```bash
-insmod kernel/gyro_uprobe.ko
+insmod kernel/gyrohook.ko
 ```
 
 Install the hook:
@@ -115,7 +115,7 @@ Disable it:
 Unload the module:
 
 ```bash
-rmmod gyro_uprobe
+rmmod gyrohook
 ```
 
 ## Limitations

@@ -4,7 +4,7 @@
 
 ## Introduction
 
-GyroHook provides two ways to modify Android gyroscope data: an Xposed application-layer hook and a standalone kernel uprobe reference implementation. It includes an Android app, an Xposed module, a C++ command-line tool, and a kernel control utility for researching Android sensor event pipelines.
+GyroHook provides two ways to modify Android gyroscope data: an Xposed application-layer hook and a standalone kernel module reference implementation. It includes an Android app, an Xposed module, a C++ command-line tool, and a kernel control utility for researching Android sensor event pipelines.
 
 ## Features
 
@@ -33,11 +33,11 @@ GyroHook provides two ways to modify Android gyroscope data: an Xposed applicati
    - `main.cpp`: Main program with `socket` and `file` operation modes.
    - `GyroHook.cpp` / `GyroHook.hpp`: Socket communication logic and file operation logic.
 
-4. **Kernel uprobe reference implementation (`kernel` and `userspace` directories)**:
+4. **Kernel module reference implementation (`kernel` and `userspace` directories)**:
    - Standalone kernel module that uses uprobe to hook the sensor conversion function in `libsensorservice.so`.
    - Userspace tool that selects the AIDL/HIDL conversion function and writes the two-axis gyroscope vector through ioctl.
-   - See [kernel uprobe reference](docs/kernel_uprobe_reference.md) for build and usage notes.
-   - `kernel/gyro_uprobe.c` uses GPL-2.0; the userspace tool and Xposed implementation remain MIT.
+   - See [kernel GyroHook reference](docs/kernel_gyrohook_reference.md) for build and usage notes.
+   - `kernel/gyrohook.c` uses GPL-2.0; the userspace tool and Xposed implementation remain MIT.
 
 ## How It Works
 
