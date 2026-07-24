@@ -4,7 +4,7 @@
 
 ## 简介
 
-GyroHook 是一个允许用户修改安卓设备陀螺仪传感器数据的项目。它包含一个安卓应用、一个 Xposed 模块和一个 C++ 命令行工具，它们共同协作以实现对陀螺仪数据的自定义控制。
+GyroHook 提供两种修改安卓陀螺仪数据的实现路径：一套基于 Xposed 的应用层 Hook，以及一套独立的内核 uprobe 参考实现。项目包含安卓应用、Xposed 模块、C++ 命令行工具和内核控制工具，可用于研究安卓传感器事件链路。
 
 ## 主要功能
 
@@ -32,6 +32,12 @@ GyroHook 是一个允许用户修改安卓设备陀螺仪传感器数据的项�
 3. **C++ 命令行工具 (`test` 目录)**:
    - `main.cpp`: 主程序，提供 `socket` 和 `file` 两种操作模式。
    - `GyroHook.cpp` / `GyroHook.hpp`: 包含 Socket 通信逻辑和文件操作逻辑。
+
+4. **内核 uprobe 参考实现 (`kernel` 与 `userspace` 目录)**:
+   - 独立内核模块：通过 uprobe 挂钩 `libsensorservice.so` 的传感器事件转换函数。
+   - 用户态工具：自动选择 AIDL/HIDL 转换函数并通过 ioctl 写入二维陀螺仪向量。
+   - 使用与构建说明见 [内核 uprobe 参考实现](docs/内核_uprobe_参考实现.md)。
+   - `kernel/gyro_uprobe.c` 使用 GPL-2.0；用户态工具与 Xposed 部分仍使用 MIT。
 
 ## 工作流程
 
