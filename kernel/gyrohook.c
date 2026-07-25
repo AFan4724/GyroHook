@@ -12,6 +12,7 @@
 #include <linux/spinlock.h>
 #include <linux/uaccess.h>
 #include <linux/uprobes.h>
+#include <linux/version.h>
 
 #include "include/gyrohook.h"
 
@@ -30,6 +31,9 @@ struct gyro_state {
     bool enabled;
     bool registered;
     struct uprobe_consumer consumer;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+    struct uprobe *uprobe;
+#endif
 };
 
 static struct gyro_state state;
@@ -37,7 +41,7 @@ static struct gyro_state state;
 static int gyro_uprobe_pre_handler(struct uprobe_consumer *consumer,
                                    struct pt_regs *regs)
 {
-    struct gyro_state *current;
+    struct gyro_state *gyro;
     unsigned long event_address;
     int sensor_type = 0;
     size_t vector_offset;
@@ -51,13 +55,13 @@ static int gyro_uprobe_pre_handler(struct uprobe_consumer *consumer,
         return 0;
     }
 
-    current = container_of(consumer, struct gyro_state, consumer);
-    spin_lock(&current->lock);
-    x = current->x;
-    y = current->y;
-    enabled = current->enabled;
-    sensor_api = current->sensor_api;
-    spin_unlock(&current->lock);
+    gyro = container_of(consumer, struct gyro_state, consumer);
+    spin_lock(&gyro->lock);
+    x = gyro->x;
+    y = gyro->y;
+    enabled = gyro->enabled;
+    sensor_api = gyro->sensor_api;
+    spin_unlock(&gyro->lock);
 
     if (!enabled || (x == 0.0f && y == 0.0f)) {
         return 0;
@@ -99,6 +103,9 @@ static int gyro_register_uprobe(const struct gyro_hook_setup *setup)
 {
     struct path path;
     struct inode *inode;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+    struct uprobe *uprobe;
+#endif
     int result;
 
     if (setup->convert_offset <= 0) {
@@ -132,26 +139,42 @@ static int gyro_register_uprobe(const struct gyro_hook_setup *setup)
 
     memset(&state.consumer, 0, sizeof(state.consumer));
     state.consumer.handler = gyro_uprobe_pre_handler;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+    uprobe = uprobe_register(inode, setup->convert_offset, 0,
+                             &state.consumer);
+    result = PTR_ERR_OR_ZERO(uprobe);
+#else
     result = uprobe_register(inode, setup->convert_offset, &state.consumer);
+#endif
     path_put(&path);
     if (result) {
         return result;
     }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+    state.uprobe = uprobe;
+#endif
     state.registered = true;
     return 0;
 }
 
 static void gyro_unregister_uprobe(void)
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 12, 0)
     struct path path;
     struct inode *inode;
     int result;
+#endif
 
     if (!state.registered) {
         return;
     }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+    uprobe_unregister_nosync(state.uprobe, &state.consumer);
+    uprobe_unregister_sync();
+    state.uprobe = NULL;
+#else
     result = kern_path(SENSOR_SERVICE_PATH, LOOKUP_FOLLOW, &path);
     if (!result) {
         inode = d_backing_inode(path.dentry);
@@ -160,6 +183,7 @@ static void gyro_unregister_uprobe(void)
         }
         path_put(&path);
     }
+#endif
     state.registered = false;
 
     spin_lock(&state.lock);
